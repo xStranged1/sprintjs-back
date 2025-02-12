@@ -1,33 +1,29 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
-import { User } from "../entity/User"
 import 'dotenv/config'
+import { Sprint } from "@/entities/Sprint";
+import { User } from "@/entities/User";
 
 const {
-    HOST = 'http://localhost:3000/api',
-    USERNAME = '',
-    PASSWORD = '',
-    DATABASE = '',
+    DB_HOST = 'http://localhost:3000/api',
+    DB_USERNAME = '',
+    DB_PASSWORD = '',
+    DB_DATABASE = '',
 } = process.env;
-
-console.log(HOST);
-console.log(USERNAME);
-console.log(PASSWORD);
-console.log(DATABASE);
 
 export const AppDataSource = new DataSource({
     type: "postgres",
-    host: HOST,
+    host: DB_HOST,
     port: 5432,
-    username: USERNAME,
-    password: PASSWORD,
-    database: DATABASE,
+    username: DB_USERNAME,
+    password: DB_PASSWORD,
+    database: DB_DATABASE,
     ssl: {
         rejectUnauthorized: false,
     },
-    synchronize: false,
+    synchronize: true,
     logging: true,
-    entities: [User],
+    entities: [User, Sprint],
     migrations: [],
     subscribers: [],
 })

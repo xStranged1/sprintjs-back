@@ -1,0 +1,1 @@
+export const msgInternalError = 'Internal Server Error'

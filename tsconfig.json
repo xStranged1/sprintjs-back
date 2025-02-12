@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    /* Visit https://aka.ms/tsconfig to read more about this file */
+    "baseUrl": ".",
+      "paths": {
+        "@/*": ["src/*"]
+      },
     "target": "ES6",
     "module": "CommonJS",
     "outDir": "./dist",
