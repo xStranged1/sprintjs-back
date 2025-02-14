@@ -2,10 +2,13 @@ import express, { Request, Response } from "express";
 import "reflect-metadata"
 import sprintRoute from './controllers/sprintController'
 import { AppDataSource } from "./config/data-source";
+import cors from 'cors';
+import { Sprint } from "./entities/Sprint";
 
 AppDataSource.initialize().then(async () => {
     const app = express()
     app.use(express.json());
+    app.use(cors())
     const routes = [
         {
             path: '/sprint',

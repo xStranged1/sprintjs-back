@@ -2,6 +2,7 @@
 import { msgInternalError } from '@/errors/msgErrors';
 import { createSprint, getAllSprints } from '@/services/sprintService';
 import { Request, Response, Router } from 'express';
+import { validate } from "class-validator"
 
 const router = Router()
 router.get('/', async (req: Request, res: any) => {
@@ -10,11 +11,15 @@ router.get('/', async (req: Request, res: any) => {
 });
 
 router.post('/', async (req: Request, res: any) => {
-    const { distance, time, date } = req.body;
+    const { distance, time, date, takeBreak } = req.body;
     if (!distance) return res.status(400).json({ error: 'The distance is required' });
     if (!time) return res.status(400).json({ error: 'The time is required' });
-    if (!date) return res.status(400).json({ error: 'The date is required' });
-    const newSprint = await createSprint({ distance, time, date })
+    if (!takeBreak) return res.status(400).json({ error: 'Boolean takeBreak is required' });
+    const pace = Math.round((time / distance) * 1000)
+    const sprint = { distance, time, date, pace, takeBreak }
+    const errors = await validate(sprint)
+    if (errors.length > 0) return res.status(400).json({ error: errors });
+    const newSprint = await createSprint(sprint)
     if (!newSprint) return res.status(500).json({ error: msgInternalError });
     return res.status(201).json(newSprint);
 });

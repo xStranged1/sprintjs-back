@@ -12,8 +12,14 @@ export class Sprint {
     @Column()
     time: number // time in seconds
 
-    @Column({ type: 'date' })
-    date: Date // time in seconds
+    @Column()
+    pace: number // seconds per km
+
+    @Column()
+    takeBreak: boolean
+
+    @Column()
+    date: Date
 
     @CreateDateColumn()
     createDate: Date
