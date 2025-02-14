@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/index.ts --watch",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "ts-node -r tsconfig-paths/register src/index.ts --watch"  
   },
   "repository": {
     "type": "git",
