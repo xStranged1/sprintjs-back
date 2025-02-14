@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/config/data-source.ts","./src/controllers/sprintcontroller.ts","./src/entities/sprint.ts","./src/entities/user.ts","./src/errors/msgerrors.ts","./src/services/sprintservice.ts"],"version":"5.7.2"}

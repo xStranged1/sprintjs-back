@@ -21,7 +21,7 @@ export const AppDataSource = new DataSource({
     ssl: {
         rejectUnauthorized: false,
     },
-    synchronize: true,
+    synchronize: false,
     logging: true,
     entities: [User, Sprint],
     migrations: [],

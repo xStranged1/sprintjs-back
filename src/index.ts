@@ -3,7 +3,7 @@ import "reflect-metadata"
 import sprintRoute from './controllers/sprintController'
 import { AppDataSource } from "./config/data-source";
 import cors from 'cors';
-import { Sprint } from "./entities/Sprint";
+import "tsconfig-paths/register";
 
 AppDataSource.initialize().then(async () => {
     const app = express()

@@ -10,6 +10,8 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.distance = sprint.distance
         newSprint.time = sprint.time
         newSprint.date = sprint.date
+        newSprint.pace = sprint.pace
+        newSprint.takeBreak = sprint.takeBreak
         await sprintRepository.save(newSprint)
         return newSprint
     } catch (error) {
