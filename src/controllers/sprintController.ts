@@ -1,7 +1,8 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createSprint, getAllSprints } from '@/services/sprintService';
-import { Request, Response, Router } from 'express';
+import { createSprint, deleteSprint, getAllSprints, updateSprint } from '@/services/sprintService';
+import { Router } from 'express';
+import type { Request, Response } from 'express';
 import { validate } from "class-validator"
 
 const router = Router()
@@ -14,7 +15,7 @@ router.post('/', async (req: Request, res: any) => {
     const { distance, time, date, takeBreak } = req.body;
     if (!distance) return res.status(400).json({ error: 'The distance is required' });
     if (!time) return res.status(400).json({ error: 'The time is required' });
-    if (!takeBreak) return res.status(400).json({ error: 'Boolean takeBreak is required' });
+    if (typeof takeBreak !== 'boolean') return res.status(400).json({ error: 'Boolean takeBreak is required' });
     const pace = Math.round((time / distance) * 1000)
     const sprint = { distance, time, date, pace, takeBreak }
     const errors = await validate(sprint)
@@ -24,6 +25,22 @@ router.post('/', async (req: Request, res: any) => {
     return res.status(201).json(newSprint);
 });
 
+router.delete('/', async (req: Request, res: any) => {
+    const { id } = req.body;
+    if (!id) return res.status(400).json({ error: 'The field "id" is required.' });
+    const delRes = await deleteSprint(id)
+    if (delRes == 404) return res.status(404).json({ msg: 'Sprint not found' });
+    if (delRes) return res.status(200).json(delRes);
+    return res.status(500).json({ error: msgInternalError });
+});
+
+router.patch('/', async (req: Request, res: any) => {
+    const { distance, time, date, takeBreak, id } = req.body;
+    if (!id) return res.status(400).json({ error: 'The field "id" is required.' });
+    const updatedSprint = await updateSprint({ distance, time, date, takeBreak, id })
+    if (updatedSprint) return res.status(200).json(updatedSprint);
+    return res.status(500).json({ error: msgInternalError });
+})
 
 // get all sorteos
 // router.get('/', async (req: Request, res: Response) => {

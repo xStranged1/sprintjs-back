@@ -21,6 +21,35 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
 
 }
 
+export const deleteSprint = async (sprintId: number) => {
+    try {
+        const res = await sprintRepository.delete(sprintId)
+        if (res.affected == 0) return 404
+        return res
+    }
+    catch (error) {
+        console.log(error);
+        return null
+    }
+}
+
+export const updateSprint = async (sprint: Partial<Sprint>) => {
+
+    try {
+        const updatedSprint = await AppDataSource
+            .createQueryBuilder()
+            .update(Sprint)
+            .set(sprint)
+            .where("id = :id", { id: sprint.id })
+            .execute()
+        return updatedSprint
+    }
+    catch (error) {
+        console.log(error);
+        return null
+    }
+}
+
 export const getAllSprints = async () => {
     try {
         const sprints = await sprintRepository.find()

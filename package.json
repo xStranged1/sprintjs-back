@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/index.ts --watch",
     "build": "tsc",
-    "start": "ts-node -r tsconfig-paths/register src/index.ts --watch"  
+    "start": "ts-node -r tsconfig-paths/register src/index.ts"
   },
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "class-validator": "^0.14.1",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
-    "express": "^4.21.2",
+    "express": "^5.0.1",
     "pg": "^8.13.2",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
