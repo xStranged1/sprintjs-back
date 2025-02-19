@@ -9,8 +9,8 @@ import responseMiddleware from "./middlewares/responseMiddleware";
 AppDataSource.initialize().then(async () => {
     const app = express()
     app.use(express.json());
-    app.use(responseMiddleware);
     app.use(cors())
+    app.use(responseMiddleware);
     sprintRoutes(app)
 
     console.log('Running at http://localhost:3000/');
