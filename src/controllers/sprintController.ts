@@ -1,146 +1,50 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
 import { createSprint, deleteSprint, getAllSprints, updateSprint } from '@/services/sprintService';
-import { Router } from 'express';
-import type { Request, Response } from 'express';
+import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 
-const router = Router()
-router.get('/', async (req: Request, res: any) => {
+const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
-    return res.status(200).json(sprints)
-});
+    res.success(sprints, '', 200)
+};
 
-router.post('/', async (req: Request, res: any) => {
+const createSprintController = (async (req: Request, res: Response) => {
+
     const { distance, time, date, takeBreak } = req.body;
-    if (!distance) return res.status(400).json({ error: 'The distance is required' });
-    if (!time) return res.status(400).json({ error: 'The time is required' });
-    if (typeof takeBreak !== 'boolean') return res.status(400).json({ error: 'Boolean takeBreak is required' });
+    if (!distance) return res.error('The distance is required', 400)
+    if (!time) return res.error('The time is required', 400)
+    if (typeof takeBreak !== 'boolean') return res.error('Boolean takeBreak is required', 400)
     const pace = Math.round((time / distance) * 1000)
     const sprint = { distance, time, date, pace, takeBreak }
     const errors = await validate(sprint)
-    if (errors.length > 0) return res.status(400).json({ error: errors });
+    if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
     const newSprint = await createSprint(sprint)
-    if (!newSprint) return res.status(500).json({ error: msgInternalError });
-    return res.status(201).json(newSprint);
+    if (!newSprint) return res.error(msgInternalError, 500)
+    return res.success(newSprint, 'Sprint was created successfully', 201)
+
 });
 
-router.delete('/', async (req: Request, res: any) => {
+const deleteSprintController = (async (req: Request, res: Response) => {
     const { id } = req.body;
-    if (!id) return res.status(400).json({ error: 'The field "id" is required.' });
+    if (!id) return res.error('The field "id" is required.', 400)
     const delRes = await deleteSprint(id)
-    if (delRes == 404) return res.status(404).json({ msg: 'Sprint not found' });
-    if (delRes) return res.status(200).json(delRes);
-    return res.status(500).json({ error: msgInternalError });
+    if (delRes == 404) return res.error('Sprint not found', 404)
+    if (delRes) return res.success(true, 'Sprint was deleted successfully')
+    return res.error(msgInternalError, 500)
 });
 
-router.patch('/', async (req: Request, res: any) => {
+const updateSprintController = async (req: Request, res: Response) => {
     const { distance, time, date, takeBreak, id } = req.body;
-    if (!id) return res.status(400).json({ error: 'The field "id" is required.' });
+    if (!id) return res.error('The field "id" is required.', 400)
     const updatedSprint = await updateSprint({ distance, time, date, takeBreak, id })
-    if (updatedSprint) return res.status(200).json(updatedSprint);
-    return res.status(500).json({ error: msgInternalError });
-})
+    if (updatedSprint) return res.success(updatedSprint, 'Sprint was updated successfully', 200)
+    return res.error(msgInternalError, 500)
+}
 
-// get all sorteos
-// router.get('/', async (req: Request, res: Response) => {
-//     const sorteos = await Sorteo.findAll();
-//     return res.status(200).json(sorteos)
-// });
-
-
-
-// // get sorteo by id
-// router.get('/:id', async (req: Request, res: Response) => {
-//     const { id } = req.params
-//     if (!validateUUID(id)) return res.status(400).json({ error: msgUUIDInvalid })
-//     const sorteo = await Sorteo.findAll({
-//         include:
-//             [{ model: RaffleNumber, required: false },
-//             { model: User, required: false },
-//             { model: Seller, required: false }
-//             ],
-//         where: { id: id }
-//     });
-//     return res.status(200).json(sorteo)
-// });
-
-
-// // create a sorteo
-// router.post('/', async (req: Request, res: Response) => {
-//     try {
-//         const { name, dateStart, organizationId, description, numberCount } = req.body;
-//         if (!name || typeof name !== 'string') return res.status(400).json({ error: msgNameRequired });
-//         if (!organizationId) return res.status(400).json({ error: 'The raffle must be associated with an organization.' });
-//         if (!numberCount) return res.status(400).json({ error: `The "numberCount" is required` });
-//         if (typeof numberCount != 'number') return res.status(400).json({ error: `The "numberCount" must be a number` });
-//         if (dateStart) {
-//             if (!isValidISO8601(dateStart)) return res.status(400).json({ error: msgDateFormatError });
-//         }
-
-//         Sorteo.create({
-//             name: name,
-//             numberCount: numberCount,
-//             description: description,
-//             dateStart: dateStart,
-//             organizationId: organizationId,
-//         })
-//             .then((sorteo) => {
-//                 return res.status(201).json(sorteo);
-//             })
-//             .catch(() => {
-//                 return res.status(500).json({ error: msgServerError });
-//             });
-
-//     } catch (e) {
-//         return res.status(500).json(msgServerError)
-//     }
-
-// });
-
-
-// // update a Sorteo
-// router.patch('/:id', async (req: Request, res: Response) => {
-//     const { id } = req.params
-//     const { name, dateStart, numberCount, description, organizationId } = req.body
-//     if (name) {
-//         if (typeof name != 'string') return res.status(400).json({ error: msgNameRequired })
-//     }
-//     if (dateStart) {
-//         if (!isValidISO8601(dateStart)) return res.status(400).json({ error: msgDateFormatError });
-//     }
-//     if (numberCount) {
-//         if (typeof numberCount != 'number') return res.status(400).json({ error: `The "numberCount" must be a number` });
-//     }
-//     if (description) {
-//         if (typeof description !== 'string') return res.status(400).json({ error: msgDescriptionString });
-//         if (description.length > 1500) return res.status(400).json({ error: msgDescriptionLength });
-//     }
-//     Sorteo.update(
-//         {
-//             name: name,
-//             description: description,
-//             dateStart: dateStart,
-//             organizationId: organizationId,
-//             numberCount: numberCount,
-//         },
-//         { where: { id: id } }
-//     )
-//         .then(() => {
-//             return res.status(200).json();
-//         })
-//         .catch(() => {
-//             return res.status(500).json({ error: msgServerError });
-//         });
-// });
-
-
-// // delete a Sorteo
-// router.delete('/:id', async (req: Request, res: Response) => {
-//     const { id } = req.params
-//     Sorteo.destroy({ where: { id: id } })
-//         .then(() => { return res.status(200).json() })
-//         .catch(() => { return res.status(500).json({ error: msgServerError }) })
-// });
-
-export default router;
+export const sprintRoutes = (app: Application): void => {
+    app.post("/sprint", createSprintController);
+    app.get("/sprint", getAllSprintController);
+    app.patch("/sprint", updateSprintController);
+    app.delete("/sprint", deleteSprintController);
+};
