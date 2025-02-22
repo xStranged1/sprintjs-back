@@ -1,12 +1,21 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createSprint, deleteSprint, getAllSprints, updateSprint } from '@/services/sprintService';
+import { createSprint, deleteSprint, getAllSprints, getSprint, updateSprint } from '@/services/sprintService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 
 const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
-    res.success(sprints, '', 200)
+    res.success(sprints, 'Sprints found', 200)
+};
+
+const getSprintController = async (req: Request, res: Response) => {
+    const { sprintId } = req.params
+    const id = Number(sprintId)
+    const sprint = await getSprint(id)
+    if (sprint == 404) return res.error('Sprint not found', 404)
+    if (sprint) return res.success(sprint, 'Sprint found', 200)
+    return res.error(msgInternalError, 500)
 };
 
 const createSprintController = (async (req: Request, res: Response) => {
@@ -26,8 +35,9 @@ const createSprintController = (async (req: Request, res: Response) => {
 });
 
 const deleteSprintController = (async (req: Request, res: Response) => {
-    const { id } = req.body;
-    if (!id) return res.error('The field "id" is required.', 400)
+    const { sprintId } = req.params
+    const id = Number(sprintId)
+    if (isNaN(id)) return res.error('The param "sprintId" must be a number.', 400)
     const delRes = await deleteSprint(id)
     if (delRes == 404) return res.error('Sprint not found', 404)
     if (delRes) return res.success(true, 'Sprint was deleted successfully')
@@ -36,8 +46,10 @@ const deleteSprintController = (async (req: Request, res: Response) => {
 
 const updateSprintController = async (req: Request, res: Response) => {
     const { distance, time, date, takeBreak, id } = req.body;
-    if (!id) return res.error('The field "id" is required.', 400)
-    const updatedSprint = await updateSprint({ distance, time, date, takeBreak, id })
+    const { sprintId } = req.params
+    if (isNaN(Number(sprintId))) return res.error('The param "sprintId" must be a number.', 400)
+    const updatedSprint = await updateSprint(Number(sprintId), { distance, time, date, takeBreak, id })
+    if (updatedSprint == 404) return res.error('Sprint not found', 404)
     if (updatedSprint) return res.success(updatedSprint, 'Sprint was updated successfully', 200)
     return res.error(msgInternalError, 500)
 }
@@ -45,6 +57,7 @@ const updateSprintController = async (req: Request, res: Response) => {
 export const sprintRoutes = (app: Application): void => {
     app.post("/sprint", createSprintController);
     app.get("/sprint", getAllSprintController);
-    app.patch("/sprint", updateSprintController);
-    app.delete("/sprint", deleteSprintController);
+    app.get("/sprint/:sprintId", getSprintController);
+    app.patch("/sprint/:sprintId", updateSprintController);
+    app.delete("/sprint/:sprintId", deleteSprintController);
 };

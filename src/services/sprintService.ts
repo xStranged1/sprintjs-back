@@ -33,18 +33,40 @@ export const deleteSprint = async (sprintId: number) => {
     }
 }
 
-export const updateSprint = async (sprint: Partial<Sprint>) => {
-
+export const updateSprint = async (sprintId: number, sprint: Partial<Sprint>) => {
     try {
-        const updatedSprint = await AppDataSource
+        const existingSprint = await sprintRepository.findOneBy({ id: sprintId });
+        if (!existingSprint) return 404
+        // Calcula el nuevo "pace" si es necesario
+        if (sprint.time !== undefined || sprint.distance !== undefined) {
+            const time = sprint.time ?? existingSprint.time;
+            const distance = sprint.distance ?? existingSprint.distance;
+            if (time && distance) {
+                const newPace = Math.round((time / distance) * 1000);
+                sprint.pace = newPace
+                existingSprint.pace = newPace
+            }
+        }
+
+        await AppDataSource
             .createQueryBuilder()
             .update(Sprint)
             .set(sprint)
-            .where("id = :id", { id: sprint.id })
-            .execute()
-        return updatedSprint
+            .where("id = :id", { id: sprintId })
+            .execute();
+        return sprint;
+    } catch (error) {
+        console.error("Error updating sprint:", error);
+        return null;
     }
-    catch (error) {
+};
+
+export const getSprint = async (sprintId: number) => {
+    try {
+        const existingSprint = await sprintRepository.findOneBy({ id: sprintId });
+        if (!existingSprint) return 404
+        return existingSprint
+    } catch (error) {
         console.log(error);
         return null
     }
@@ -58,7 +80,6 @@ export const getAllSprints = async () => {
         console.log(error);
         return []
     }
-
 }
 
 export const getTotalSeconds = (hours: number | undefined, minutes: number | undefined, seconds: number | undefined) => {
