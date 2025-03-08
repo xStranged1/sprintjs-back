@@ -3,6 +3,7 @@ import { msgInternalError } from '@/errors/msgErrors';
 import { createSprint, deleteSprint, getAllSprints, getSprint, updateSprint } from '@/services/sprintService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
+import { Sprint } from '@/entities/Sprint';
 
 const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
@@ -28,7 +29,7 @@ const createSprintController = (async (req: Request, res: Response) => {
     const sprint = { distance, time, date, pace, takeBreak }
     const errors = await validate(sprint)
     if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
-    const newSprint = await createSprint(sprint)
+    const newSprint = await createSprint(sprint as Sprint)
     if (!newSprint) return res.error(msgInternalError, 500)
     return res.success(newSprint, 'Sprint was created successfully', 201)
 

@@ -5,6 +5,7 @@
   "scripts": {
     "dev": "ts-node -r tsconfig-paths/register src/index.ts --watch",
     "build": "tsc",
+    "typeorm": "typeorm-ts-node-esm",
     "start": "ts-node -r tsconfig-paths/register src/index.ts --watch"
   },
   "repository": {

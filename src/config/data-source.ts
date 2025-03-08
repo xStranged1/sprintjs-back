@@ -3,6 +3,7 @@ import { DataSource } from "typeorm"
 import 'dotenv/config'
 import { Sprint } from "@/entities/Sprint";
 import { User } from "@/entities/User";
+import { Circuit } from "@/entities/Circuit";
 
 const {
     DB_HOST = 'http://localhost:3000/api',
@@ -23,7 +24,7 @@ export const AppDataSource = new DataSource({
     },
     synchronize: false,
     logging: true,
-    entities: [User, Sprint],
+    entities: [User, Sprint, Circuit],
     migrations: [],
     subscribers: [],
 })

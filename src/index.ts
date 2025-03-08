@@ -1,10 +1,13 @@
 import express, { Request, Response } from "express";
 import "reflect-metadata"
 import { sprintRoutes } from './controllers/sprintController'
+import { circuitRoutes } from "./controllers/circuitController";
 import { AppDataSource } from "./config/data-source";
 import cors from 'cors';
 import "tsconfig-paths/register";
 import responseMiddleware from "./middlewares/responseMiddleware";
+import { saveState } from "./migration/saveState";
+import { restoreState } from "./migration/restoreState";
 
 AppDataSource.initialize().then(async () => {
     const app = express()
@@ -12,7 +15,8 @@ AppDataSource.initialize().then(async () => {
     app.use(cors())
     app.use(responseMiddleware);
     sprintRoutes(app)
-
+    circuitRoutes(app)
+    restoreState()
     console.log('Running at http://localhost:3000/');
     app.get('/err', (req: Request, res: Response) => {
         res.error("No se pudo obtener el usuario", 400, { reason: "ID inválido" });
