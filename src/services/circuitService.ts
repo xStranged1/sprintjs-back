@@ -50,3 +50,20 @@ export const getAllCircuits = async () => {
         return []
     }
 }
+
+export const updateCircuit = async (circuitId: number, circuit: Partial<Circuit>) => {
+    try {
+        const existingCircuit = await circuitRepository.findOneBy({ id: circuitId });
+        if (!existingCircuit) return 404
+        await AppDataSource
+            .createQueryBuilder()
+            .update(Circuit)
+            .set(circuit)
+            .where("id = :id", { id: circuitId })
+            .execute();
+        return circuit;
+    } catch (error) {
+        console.error("Error updating circuit:", error);
+        return null;
+    }
+};

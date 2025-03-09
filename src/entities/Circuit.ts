@@ -9,7 +9,7 @@ export class Circuit {
     @Column()
     name: string
 
-    @Column()
+    @Column({ type: 'float' })
     distance: number
 
 }

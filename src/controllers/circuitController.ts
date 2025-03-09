@@ -1,6 +1,6 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createCircuit, deleteCircuit, getAllCircuits, getCircuit } from '@/services/circuitService';
+import { createCircuit, deleteCircuit, getAllCircuits, getCircuit, updateCircuit } from '@/services/circuitService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 
@@ -42,20 +42,28 @@ const deleteCircuitController = (async (req: Request, res: Response) => {
     return res.error(msgInternalError, 500)
 });
 
-// const updateCircuitController = async (req: Request, res: Response) => {
-//     const { distance, time, date, takeBreak, id } = req.body;
-//     const { circuitId } = req.params
-//     if (isNaN(Number(circuitId))) return res.error('The param "circuitId" must be a number.', 400)
-//     const updatedCircuit = await updateCircuit(Number(circuitId), { distance, time, date, takeBreak, id })
-//     if (updatedCircuit == 404) return res.error('Circuit not found', 404)
-//     if (updatedCircuit) return res.success(updatedCircuit, 'Circuit was updated successfully', 200)
-//     return res.error(msgInternalError, 500)
-// }
+const updateCircuitController = async (req: Request, res: Response) => {
+    const { name, distance } = req.body;
+    const { circuitId } = req.params
+    let circuit: any
+    if (name) circuit.name = name
+    if (isNaN(Number(circuitId))) return res.error('The param "circuitId" must be a number.', 400)
+    if (distance) {
+        const numberDistance = Number(distance)
+        if (isNaN(numberDistance)) return res.error('"distance" must be a number.', 400)
+        if (numberDistance <= 0) return res.error('"distance" must be a positive number.', 400)
+        circuit.distance = numberDistance
+    }
+    const updatedCircuit = await updateCircuit(Number(circuitId), circuit)
+    if (updatedCircuit == 404) return res.error('Circuit not found', 404)
+    if (updatedCircuit) return res.success(updatedCircuit, 'Circuit was updated successfully', 200)
+    return res.error(msgInternalError, 500)
+}
 
 export const circuitRoutes = (app: Application): void => {
     app.post("/circuit", createCircuitController);
     app.get("/circuit", getAllCircuitController);
     app.get("/circuit/:circuitId", getCircuitController);
-    // app.patch("/circuit/:circuitId", updateCircuitController);
+    app.patch("/circuit/:circuitId", updateCircuitController);
     app.delete("/circuit/:circuitId", deleteCircuitController);
 };

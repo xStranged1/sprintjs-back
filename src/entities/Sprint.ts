@@ -16,6 +16,18 @@ export class Sprint {
     @Column()
     pace: number // seconds per km
 
+    @Column({ nullable: true })
+    numberOfLaps: number
+
+    @Column({ nullable: true })
+    comment: string
+
+    @Column({ nullable: true })
+    effort: number
+
+    @Column({ nullable: true })
+    temperature: number
+
     @Column()
     takeBreak: boolean
 
@@ -28,4 +40,7 @@ export class Sprint {
     @UpdateDateColumn()
     updateDate: Date
 
+    @OneToOne(() => Circuit, { nullable: true })
+    @JoinColumn()
+    circuit: Circuit
 }

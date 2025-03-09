@@ -16,7 +16,7 @@ AppDataSource.initialize().then(async () => {
     app.use(responseMiddleware);
     sprintRoutes(app)
     circuitRoutes(app)
-    restoreState()
+    // saveState()
     console.log('Running at http://localhost:3000/');
     app.get('/err', (req: Request, res: Response) => {
         res.error("No se pudo obtener el usuario", 400, { reason: "ID inválido" });

@@ -4,6 +4,7 @@ import { createSprint, deleteSprint, getAllSprints, getSprint, updateSprint } fr
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 import { Sprint } from '@/entities/Sprint';
+import { Circuit } from '@/entities/Circuit';
 
 const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
@@ -21,15 +22,19 @@ const getSprintController = async (req: Request, res: Response) => {
 
 const createSprintController = (async (req: Request, res: Response) => {
 
-    const { distance, time, date, takeBreak } = req.body;
+    const { distance, time, date, takeBreak, circuit, comment, effort, temperature, numberOfLaps } = req.body;
     if (!distance) return res.error('The distance is required', 400)
     if (!time) return res.error('The time is required', 400)
+    if (circuit) {
+        const errors = await validate(Object.assign(new Circuit(), circuit));
+        if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
+    }
     if (typeof takeBreak !== 'boolean') return res.error('Boolean takeBreak is required', 400)
     const pace = Math.round((time / distance) * 1000)
-    const sprint = { distance, time, date, pace, takeBreak }
+    const sprint = Object.assign(new Sprint(), { distance, time, date, pace, takeBreak, circuit, comment, effort, temperature, numberOfLaps })
     const errors = await validate(sprint)
     if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
-    const newSprint = await createSprint(sprint as Sprint)
+    const newSprint = await createSprint(sprint)
     if (!newSprint) return res.error(msgInternalError, 500)
     return res.success(newSprint, 'Sprint was created successfully', 201)
 

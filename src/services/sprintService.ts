@@ -12,6 +12,11 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.date = sprint.date
         newSprint.pace = sprint.pace
         newSprint.takeBreak = sprint.takeBreak
+        newSprint.circuit = sprint.circuit
+        newSprint.comment = sprint.comment
+        newSprint.effort = sprint.effort
+        newSprint.temperature = sprint.temperature
+        newSprint.numberOfLaps = sprint.numberOfLaps
         await sprintRepository.save(newSprint)
         return newSprint
     } catch (error) {
@@ -74,7 +79,7 @@ export const getSprint = async (sprintId: number) => {
 
 export const getAllSprints = async () => {
     try {
-        const sprints = await sprintRepository.find()
+        const sprints = await sprintRepository.find({ relations: { 'circuit': true } })
         return sprints
     } catch (error) {
         console.log(error);
