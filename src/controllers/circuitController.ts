@@ -3,6 +3,7 @@ import { msgInternalError } from '@/errors/msgErrors';
 import { createCircuit, deleteCircuit, getAllCircuits, getCircuit, updateCircuit } from '@/services/circuitService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
+import { Circuit } from '@/entities/Circuit';
 
 const getAllCircuitController = async (req: Request, res: Response) => {
     const circuits = await getAllCircuits()
@@ -26,7 +27,7 @@ const createCircuitController = (async (req: Request, res: Response) => {
     const circuit = { distance, name }
     const errors = await validate(circuit)
     if (errors.length > 0) return res.error('Invalid circuit', 400, errors)
-    const newCircuit = await createCircuit(circuit)
+    const newCircuit = await createCircuit(circuit as Circuit)
     if (!newCircuit) return res.error(msgInternalError, 500)
     return res.success(newCircuit, 'Circuit was created successfully', 201)
 

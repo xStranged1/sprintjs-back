@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from "typeorm"
+import { Sprint } from "./Sprint"
 
 @Entity()
 export class Circuit {
@@ -12,4 +13,6 @@ export class Circuit {
     @Column({ type: 'float' })
     distance: number
 
+    @OneToMany(() => Sprint, (sprint) => sprint.circuit)
+    sprints: Sprint[]
 }
