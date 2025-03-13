@@ -79,7 +79,7 @@ export const getSprint = async (sprintId: number) => {
 
 export const getAllSprints = async () => {
     try {
-        const sprints = await sprintRepository.find({ relations: { 'circuit': true } })
+        const sprints = await sprintRepository.find({ relations: { 'circuit': true }, order: { date: 'DESC' } })
         return sprints
     } catch (error) {
         console.log(error);
