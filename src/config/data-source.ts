@@ -10,12 +10,13 @@ const {
     DB_USERNAME = '',
     DB_PASSWORD = '',
     DB_DATABASE = '',
+    DB_PORT = 5432
 } = process.env;
 
 export const AppDataSource = new DataSource({
     type: "postgres",
     host: DB_HOST,
-    port: 5432,
+    port: Number(}),
     username: DB_USERNAME,
     password: DB_PASSWORD,
     database: DB_DATABASE,
