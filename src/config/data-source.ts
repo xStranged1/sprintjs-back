@@ -4,6 +4,8 @@ import 'dotenv/config'
 import { Sprint } from "@/entities/Sprint";
 import { User } from "@/entities/User";
 import { Circuit } from "@/entities/Circuit";
+import { PersonalRecord } from "@/entities/PersonalRecord";
+import { Distance } from "@/entities/Distance";
 
 const {
     DB_HOST = 'http://localhost:3000/api',
@@ -25,7 +27,7 @@ export const AppDataSource = new DataSource({
     },
     synchronize: false,
     logging: true,
-    entities: [User, Sprint, Circuit],
+    entities: [User, Sprint, Circuit, PersonalRecord, Distance],
     migrations: [],
     subscribers: [],
 })

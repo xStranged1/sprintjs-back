@@ -8,6 +8,8 @@ import "tsconfig-paths/register";
 import responseMiddleware from "./middlewares/responseMiddleware";
 import { saveState } from "./migration/saveState";
 import { restoreState } from "./migration/restoreState";
+import { personalRecordRoutes } from "./controllers/personalRecordController";
+import { distancesRoutes } from "./controllers/distanceController";
 
 AppDataSource.initialize().then(async () => {
     const app = express()
@@ -16,6 +18,8 @@ AppDataSource.initialize().then(async () => {
     app.use(responseMiddleware);
     sprintRoutes(app)
     circuitRoutes(app)
+    personalRecordRoutes(app)
+    distancesRoutes(app)
     // saveState()
     console.log('Running at http://localhost:3000/');
     app.get('/err', (req: Request, res: Response) => {

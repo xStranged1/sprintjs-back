@@ -1,3 +1,5 @@
 node_modules/
 .env
 backup.json
+backup copy.json
+backup copy 2.json
