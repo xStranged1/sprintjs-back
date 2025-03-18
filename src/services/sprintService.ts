@@ -1,5 +1,6 @@
 import { AppDataSource } from "@/config/data-source"
 import { Sprint } from "@/entities/Sprint"
+import { handleNewRecord, isNewRecord } from "./personalRecordService"
 
 const sprintRepository = AppDataSource.getRepository(Sprint)
 
@@ -18,6 +19,7 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.temperature = sprint.temperature
         newSprint.numberOfLaps = sprint.numberOfLaps
         await sprintRepository.save(newSprint)
+        handleNewRecord(newSprint)
         return newSprint
     } catch (error) {
         console.log(error);

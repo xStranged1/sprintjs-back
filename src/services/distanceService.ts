@@ -1,5 +1,6 @@
 import { AppDataSource } from "@/config/data-source"
 import { Distance } from "@/entities/Distance"
+import { Sprint } from "@/entities/Sprint"
 
 const distanceRepository = AppDataSource.getRepository(Distance)
 
@@ -19,11 +20,30 @@ export const createDistance = async (distance: Omit<Distance, 'id'>) => {
 
 export const getAllDistances = async () => {
     try {
-        const sprints = await distanceRepository.find()
+        const sprints = await distanceRepository.find({ order: { 'distance': 'asc' } })
         return sprints
     } catch (error) {
         console.log(error);
         return []
+    }
+}
+
+export const getDistanceBySprint = async (sprint: Sprint): Promise<Distance | null> => {
+    try {
+        const closestDistanceRaw = await distanceRepository.query(`
+            SELECT * FROM distance
+            ORDER BY ABS(distance - $1)
+            LIMIT 1
+          `, [sprint.distance]);
+
+        const closestDistance = closestDistanceRaw[0]
+        if (!closestDistance) return null
+        const max = closestDistance.distance + closestDistance.distance * 0.20
+        if (sprint.distance >= closestDistance.distance && sprint.distance <= max) return closestDistance
+        return null
+    } catch (error) {
+        console.log(error);
+        return null
     }
 }
 
@@ -38,43 +58,3 @@ export const deleteDistance = async (distanceId: number) => {
         return null
     }
 }
-
-// export const updateSprint = async (sprintId: number, sprint: Partial<Sprint>) => {
-//     try {
-//         const existingSprint = await sprintRepository.findOneBy({ id: sprintId });
-//         if (!existingSprint) return 404
-//         // Calcula el nuevo "pace" si es necesario
-//         if (sprint.time !== null || sprint.distance !== null) {
-//             const time = sprint.time ?? existingSprint.time;
-//             const distance = sprint.distance ?? existingSprint.distance;
-//             if (time && distance) {
-//                 const newPace = Math.round((time / distance) * 1000);
-//                 sprint.pace = newPace
-//                 existingSprint.pace = newPace
-//             }
-//         }
-
-//         await AppDataSource
-//             .createQueryBuilder()
-//             .update(Sprint)
-//             .set(sprint)
-//             .where("id = :id", { id: sprintId })
-//             .execute();
-//         return sprint;
-//     } catch (error) {
-//         console.error("Error updating sprint:", error);
-//         return null;
-//     }
-// };
-
-// export const getSprint = async (sprintId: number) => {
-//     try {
-//         const existingSprint = await sprintRepository.findOneBy({ id: sprintId });
-//         if (!existingSprint) return 404
-//         return existingSprint
-//     } catch (error) {
-//         console.log(error);
-//         return null
-//     }
-// }
-

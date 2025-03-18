@@ -1,14 +1,13 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createCircuit, deleteCircuit, getAllCircuits, getCircuit, updateCircuit } from '@/services/circuitService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
-import { Circuit } from '@/entities/Circuit';
-import { calculateAllRecords, getAllPersonalRecords } from '@/services/personalRecords';
+import { calculateAllRecords, getAllPersonalRecords } from '@/services/personalRecordService';
 
 const calculateAllRecordsController = (async (req: Request, res: Response) => {
     const newAllPersonalRecords = await calculateAllRecords()
     if (!newAllPersonalRecords) return res.error(msgInternalError, 500)
+    if (newAllPersonalRecords.length == 0) return res.success(newAllPersonalRecords, 'No new personal record was broken', 200)
     return res.success(newAllPersonalRecords, 'All personal records was calculated and created successfully', 201)
 });
 
