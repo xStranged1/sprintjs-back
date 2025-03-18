@@ -19,8 +19,8 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.temperature = sprint.temperature
         newSprint.numberOfLaps = sprint.numberOfLaps
         await sprintRepository.save(newSprint)
-        handleNewRecord(newSprint)
-        return newSprint
+        const newPersonalRecord = await handleNewRecord(newSprint)
+        return { newSprint, newPersonalRecord }
     } catch (error) {
         console.log(error);
         return null

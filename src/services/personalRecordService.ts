@@ -74,7 +74,8 @@ export const handleNewRecord = async (sprint: Sprint) => {
     const newPR = new PersonalRecord()
     newPR.distance = distance
     newPR.sprint = sprint
-    personalRecordRepository.save(newPR)
+    await personalRecordRepository.save(newPR)
+    return newPR
 }
 
 export const isNewRecord = async (sprint: Sprint): Promise<Distance | false> => {

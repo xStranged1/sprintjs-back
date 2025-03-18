@@ -11,7 +11,7 @@ export class PersonalRecord {
     @ManyToOne(() => Distance, (distance) => distance.personalRecords)
     distance: Distance
 
-    @OneToOne(() => Sprint)
+    @OneToOne(() => Sprint, { onDelete: 'CASCADE' })
     @JoinColumn()
     sprint: Sprint
 }

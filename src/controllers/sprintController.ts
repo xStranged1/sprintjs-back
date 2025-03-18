@@ -34,9 +34,12 @@ const createSprintController = (async (req: Request, res: Response) => {
     const sprint = Object.assign(new Sprint(), { distance, time, date, pace, takeBreak, circuit, comment, effort, temperature, numberOfLaps })
     const errors = await validate(sprint)
     if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
-    const newSprint = await createSprint(sprint)
-    if (!newSprint) return res.error(msgInternalError, 500)
-    return res.success(newSprint, 'Sprint was created successfully', 201)
+    const data = await createSprint(sprint)
+    if (!data) return res.error(msgInternalError, 500)
+    if (data.newPersonalRecord) {
+        return res.success(data, 'Sprint was successfully created and a personal record was broken.', 201)
+    }
+    return res.success(data, 'Sprint was successfully created', 201)
 
 });
 
