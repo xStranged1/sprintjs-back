@@ -6,8 +6,6 @@ import { AppDataSource } from "./config/data-source";
 import cors from 'cors';
 import "tsconfig-paths/register";
 import responseMiddleware from "./middlewares/responseMiddleware";
-import { saveState } from "./migration/saveState";
-import { restoreState } from "./migration/restoreState";
 import { personalRecordRoutes } from "./controllers/personalRecordController";
 import { distancesRoutes } from "./controllers/distanceController";
 import { checkJwt, checkScopes } from "./middlewares/authMiddleware";
@@ -23,7 +21,6 @@ AppDataSource.initialize().then(async () => {
     circuitRoutes(app)
     personalRecordRoutes(app)
     distancesRoutes(app)
-    // saveState()
     console.log('Running at http://localhost:3000/');
     app.get('/err', (req: Request, res: Response) => {
         res.error("No se pudo obtener el usuario", 400, { reason: "ID inválido" });

@@ -1,13 +1,20 @@
 import { AppDataSource } from "@/config/data-source"
 import { Sprint } from "@/entities/Sprint"
 import { handleNewRecord, isNewRecord } from "./personalRecordService"
+import { getUserBySub } from "./userService"
 
 const sprintRepository = AppDataSource.getRepository(Sprint)
 
-export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'updateDate'>) => {
+export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'updateDate'>, userSub: string) => {
 
     try {
+        const user = await getUserBySub(userSub)
+        if (!user || user == 404) {
+            return null
+        }
+
         const newSprint = new Sprint()
+        newSprint.user = user
         newSprint.distance = sprint.distance
         newSprint.time = sprint.time
         newSprint.date = sprint.date
@@ -79,9 +86,29 @@ export const getSprint = async (sprintId: number) => {
     }
 }
 
+
 export const getAllSprints = async () => {
     try {
         const sprints = await sprintRepository.find({ relations: { 'circuit': true }, order: { date: 'DESC' } })
+        return sprints
+    } catch (error) {
+        console.log(error);
+        return []
+    }
+}
+
+export const getAllSprintsByUserSub = async (userSub: string) => {
+    try {
+        const user = await getUserBySub(userSub)
+        if (!user || user == 404) {
+            return []
+        }
+
+        const sprints = await sprintRepository.find({
+            relations: { 'circuit': true },
+            order: { date: 'DESC' },
+            where: { user: user }
+        })
         return sprints
     } catch (error) {
         console.log(error);

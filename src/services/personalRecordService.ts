@@ -4,6 +4,7 @@ import { Sprint } from "@/entities/Sprint"
 import { getAllSprints } from "./sprintService"
 import { Distance } from "@/entities/Distance"
 import { getAllDistances, getDistanceBySprint } from "./distanceService"
+import { getUserBySub } from "./userService"
 
 const personalRecordRepository = AppDataSource.getRepository(PersonalRecord)
 
@@ -37,9 +38,14 @@ export const deleteAllPrs = async () => {
     return res
 }
 
-export const getAllPersonalRecords = async (): Promise<PersonalRecord[]> => {
+export const getPersonalRecords = async (userSub: string): Promise<PersonalRecord[]> => {
     try {
-        const prs = await personalRecordRepository.find({ relations: { 'distance': true, 'sprint': true } })
+        const user = await getUserBySub(userSub)
+        if (!user || user == 404) return []
+        const prs = await personalRecordRepository.find({
+            relations: { 'distance': true, 'sprint': true },
+            where: { user: user }
+        })
         return prs
     } catch (error) {
         console.log(error);
@@ -51,7 +57,7 @@ export const getPersonalRecordByDistance = async (distance: Distance): Promise<P
     try {
         const pr = await personalRecordRepository.findOne({
             relations: { 'distance': true, 'sprint': true },
-            where: { distance: distance }  // Comparas con el objeto distance
+            where: { distance: distance }
         });
         return pr
     } catch (error) {
@@ -61,19 +67,12 @@ export const getPersonalRecordByDistance = async (distance: Distance): Promise<P
 }
 
 export const handleNewRecord = async (sprint: Sprint) => {
-    console.log('handleNewRecord');
-    console.log("sprint");
-    console.log(sprint);
-
     const distance = await isNewRecord(sprint)
-    console.log("distance handleNewRecord");
-    console.log(distance);
-
     if (!distance) return false
-
     const newPR = new PersonalRecord()
     newPR.distance = distance
     newPR.sprint = sprint
+    newPR.user = sprint.user
     await personalRecordRepository.save(newPR)
     return newPR
 }
@@ -81,13 +80,8 @@ export const handleNewRecord = async (sprint: Sprint) => {
 export const isNewRecord = async (sprint: Sprint): Promise<Distance | false> => {
     if (sprint.takeBreak) return false
     const distance = await getDistanceBySprint(sprint)
-    console.log("distance close");
-    console.log(distance);
     if (!distance) return false
     const pr = await getPersonalRecordByDistance(distance)
-    console.log("pr in that distance");
-    console.log(pr);
-
     if (!pr) return distance
     if (sprint.pace < pr.sprint.pace) return distance
     return false

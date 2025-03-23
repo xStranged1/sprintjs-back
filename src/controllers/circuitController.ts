@@ -1,12 +1,14 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createCircuit, deleteCircuit, getAllCircuits, getCircuit, updateCircuit } from '@/services/circuitService';
+import { createCircuit, deleteCircuit, getCircuitsBySub, getCircuit, updateCircuit } from '@/services/circuitService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 import { Circuit } from '@/entities/Circuit';
+import { checkJwt, checkScopes, checkSub } from '@/middlewares/authMiddleware';
 
-const getAllCircuitController = async (req: Request, res: Response) => {
-    const circuits = await getAllCircuits()
+const getCircuitsController = async (req: Request, res: Response) => {
+    const sub = req.sub
+    const circuits = await getCircuitsBySub(sub)
     res.success(circuits, 'Circuits found', 200)
 };
 
@@ -20,17 +22,16 @@ const getCircuitController = async (req: Request, res: Response) => {
 };
 
 const createCircuitController = (async (req: Request, res: Response) => {
-
+    const sub = req.sub
     const { name, distance } = req.body;
     if (!distance) return res.error('The distance is required', 400)
     if (!name) return res.error('The time is required', 400)
     const circuit = { distance, name }
     const errors = await validate(circuit)
     if (errors.length > 0) return res.error('Invalid circuit', 400, errors)
-    const newCircuit = await createCircuit(circuit as Circuit)
+    const newCircuit = await createCircuit(circuit as Circuit, sub)
     if (!newCircuit) return res.error(msgInternalError, 500)
     return res.success(newCircuit, 'Circuit was created successfully', 201)
-
 });
 
 const deleteCircuitController = (async (req: Request, res: Response) => {
@@ -62,9 +63,9 @@ const updateCircuitController = async (req: Request, res: Response) => {
 }
 
 export const circuitRoutes = (app: Application): void => {
-    app.post("/circuit", createCircuitController);
-    app.get("/circuit", getAllCircuitController);
-    app.get("/circuit/:circuitId", getCircuitController);
-    app.patch("/circuit/:circuitId", updateCircuitController);
-    app.delete("/circuit/:circuitId", deleteCircuitController);
+    app.post("/circuit", checkJwt, checkScopes, checkSub, createCircuitController);
+    app.get("/circuit", checkJwt, checkScopes, checkSub, getCircuitsController);
+    app.get("/circuit/:circuitId", checkJwt, checkScopes, checkSub, getCircuitController);
+    app.patch("/circuit/:circuitId", checkJwt, checkScopes, checkSub, updateCircuitController);
+    app.delete("/circuit/:circuitId", checkJwt, checkScopes, checkSub, deleteCircuitController);
 };

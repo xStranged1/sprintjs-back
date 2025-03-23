@@ -44,6 +44,17 @@ export const getUser = async (userId: number) => {
     }
 }
 
+export const getUserBySub = async (userSub: string) => {
+    try {
+        const existingUser = await userRepository.findOneBy({ sub: userSub });
+        if (!existingUser) return 404
+        return existingUser
+    } catch (error) {
+        console.log(error);
+        return null
+    }
+}
+
 export const getAllUsers = async () => {
     try {
         const users = await userRepository.find()

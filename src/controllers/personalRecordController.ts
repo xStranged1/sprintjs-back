@@ -1,8 +1,8 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
 import type { Application, Request, Response } from 'express';
-import { validate } from "class-validator"
-import { calculateAllRecords, getAllPersonalRecords } from '@/services/personalRecordService';
+import { calculateAllRecords, getPersonalRecords } from '@/services/personalRecordService';
+import { checkJwt, checkScopes, checkSub } from '@/middlewares/authMiddleware';
 
 const calculateAllRecordsController = (async (req: Request, res: Response) => {
     const newAllPersonalRecords = await calculateAllRecords()
@@ -11,8 +11,9 @@ const calculateAllRecordsController = (async (req: Request, res: Response) => {
     return res.success(newAllPersonalRecords, 'All personal records was calculated and created successfully', 201)
 });
 
-const getAllCircuitController = async (req: Request, res: Response) => {
-    const prs = await getAllPersonalRecords()
+const getAllPersonalRecordController = async (req: Request, res: Response) => {
+    const sub = req.sub
+    const prs = await getPersonalRecords(sub)
     if (prs.length == 0) {
         res.success(prs, 'Personal records not found', 200)
     }
@@ -73,7 +74,7 @@ const getAllCircuitController = async (req: Request, res: Response) => {
 export const personalRecordRoutes = (app: Application): void => {
     app.post("/personalRecord", calculateAllRecordsController);
     // app.post("/circuit", createCircuitController);
-    app.get("/personalRecord", getAllCircuitController);
+    app.get("/personalRecord", checkJwt, checkScopes, checkSub, getAllPersonalRecordController);
     // app.get("/circuit/:circuitId", getCircuitController);
     // app.patch("/circuit/:circuitId", updateCircuitController);
     // app.delete("/circuit/:circuitId", deleteCircuitController);

@@ -18,6 +18,9 @@ declare global {
             success<T>(data: T, message?: string, status?: number): void;
             error(message?: string, status?: number, errors?: any): void;
         }
+        interface Request {
+            sub: string;
+        }
     }
 }
 

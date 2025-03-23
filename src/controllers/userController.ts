@@ -1,12 +1,10 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createCircuit, deleteCircuit, getAllCircuits, getCircuit, updateCircuit } from '@/services/circuitService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
-import { Circuit } from '@/entities/Circuit';
 import { createUser, deleteUser, getAllUsers, getUser } from '@/services/userService';
 import { User } from '@/entities/User';
-import { checkJwt, checkScopes } from '@/middlewares/authMiddleware';
+import { checkJwt, checkScopes, checkSub } from '@/middlewares/authMiddleware';
 
 const getAllUserController = async (req: Request, res: Response) => {
     const users = await getAllUsers()
@@ -28,8 +26,7 @@ const createUserController = (async (req: Request, res: Response) => {
     const { age, firstName, lastName } = req.body;
     if (!lastName) return res.error('The lastName is required', 400)
     if (!firstName) return res.error('The firstName is required', 400)
-    const sub = req.auth?.payload.sub
-    if (!sub) return res.error('Invalid accessToken', 401)
+    const sub = req.sub
     const user = new User
     user.age = age
     user.firstName = firstName
@@ -73,9 +70,9 @@ const deleteUserController = (async (req: Request, res: Response) => {
 // }
 
 export const userRoutes = (app: Application): void => {
-    app.post("/user", checkJwt, checkScopes, createUserController);
-    app.get("/user", checkJwt, checkScopes, getAllUserController);
-    app.get("/user/:userId", checkJwt, checkScopes, getUserController);
-    app.delete("/user/:userId", deleteUserController);
+    app.post("/user", checkJwt, checkScopes, checkSub, createUserController);
+    app.get("/user", checkJwt, checkScopes, checkSub, getAllUserController);
+    app.get("/user/:userId", checkJwt, checkScopes, checkSub, getUserController);
+    app.delete("/user/:userId", checkJwt, checkScopes, checkSub, deleteUserController);
     // app.patch("/circuit/:circuitId", updateCircuitController);
 };

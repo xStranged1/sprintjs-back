@@ -1,4 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm"
+import { Sprint } from "./Sprint"
+import { Circuit } from "./Circuit"
+import { PersonalRecord } from "./PersonalRecord"
 
 @Entity()
 export class User {
@@ -18,4 +21,12 @@ export class User {
     @Column()
     age: number
 
+    @OneToMany(() => Circuit, (circuit) => circuit.user)
+    circuits: Circuit[]
+
+    @OneToMany(() => Sprint, (sprint) => sprint.user)
+    sprints: Sprint[]
+
+    @OneToMany(() => PersonalRecord, (pr) => pr.user)
+    personalRecords: PersonalRecord[]
 }

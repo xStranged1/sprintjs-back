@@ -1,13 +1,20 @@
 
 import { msgInternalError } from '@/errors/msgErrors';
-import { createSprint, deleteSprint, getAllSprints, getSprint, updateSprint } from '@/services/sprintService';
+import { createSprint, deleteSprint, getAllSprints, getAllSprintsByUserSub, getSprint, updateSprint } from '@/services/sprintService';
 import type { Application, Request, Response } from 'express';
 import { validate } from "class-validator"
 import { Sprint } from '@/entities/Sprint';
 import { Circuit } from '@/entities/Circuit';
+import { checkJwt, checkScopes, checkSub } from '@/middlewares/authMiddleware';
 
 const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
+    res.success(sprints, 'Sprints found', 200)
+};
+
+const getSprintsController = async (req: Request, res: Response) => {
+    const sub = req.sub
+    const sprints = await getAllSprintsByUserSub(sub)
     res.success(sprints, 'Sprints found', 200)
 };
 
@@ -21,7 +28,7 @@ const getSprintController = async (req: Request, res: Response) => {
 };
 
 const createSprintController = (async (req: Request, res: Response) => {
-
+    const sub = req.sub
     const { distance, time, date, takeBreak, circuit, comment, effort, temperature, numberOfLaps } = req.body;
     if (!distance) return res.error('The distance is required', 400)
     if (!time) return res.error('The time is required', 400)
@@ -34,7 +41,7 @@ const createSprintController = (async (req: Request, res: Response) => {
     const sprint = Object.assign(new Sprint(), { distance, time, date, pace, takeBreak, circuit, comment, effort, temperature, numberOfLaps })
     const errors = await validate(sprint)
     if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
-    const data = await createSprint(sprint)
+    const data = await createSprint(sprint, sub)
     if (!data) return res.error(msgInternalError, 500)
     if (data.newPersonalRecord) {
         return res.success(data, 'Sprint was successfully created and a personal record was broken.', 201)
@@ -64,9 +71,10 @@ const updateSprintController = async (req: Request, res: Response) => {
 }
 
 export const sprintRoutes = (app: Application): void => {
-    app.post("/sprint", createSprintController);
-    app.get("/sprint", getAllSprintController);
-    app.get("/sprint/:sprintId", getSprintController);
-    app.patch("/sprint/:sprintId", updateSprintController);
-    app.delete("/sprint/:sprintId", deleteSprintController);
+    app.post("/sprint", checkJwt, checkScopes, checkSub, createSprintController);
+    app.get("/sprint", checkJwt, checkScopes, checkSub, getSprintsController);
+    app.get("/sprintAll", checkJwt, checkScopes, checkSub, getAllSprintController);
+    app.get("/sprint/:sprintId", checkJwt, checkScopes, checkSub, getSprintController);
+    app.patch("/sprint/:sprintId", checkJwt, checkScopes, checkSub, updateSprintController);
+    app.delete("/sprint/:sprintId", checkJwt, checkScopes, checkSub, deleteSprintController);
 };
