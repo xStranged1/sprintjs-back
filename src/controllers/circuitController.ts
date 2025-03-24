@@ -47,16 +47,13 @@ const deleteCircuitController = (async (req: Request, res: Response) => {
 const updateCircuitController = async (req: Request, res: Response) => {
     const { name, distance } = req.body;
     const { circuitId } = req.params
-    let circuit: any
-    if (name) circuit.name = name
     if (isNaN(Number(circuitId))) return res.error('The param "circuitId" must be a number.', 400)
     if (distance) {
         const numberDistance = Number(distance)
         if (isNaN(numberDistance)) return res.error('"distance" must be a number.', 400)
         if (numberDistance <= 0) return res.error('"distance" must be a positive number.', 400)
-        circuit.distance = numberDistance
     }
-    const updatedCircuit = await updateCircuit(Number(circuitId), circuit)
+    const updatedCircuit = await updateCircuit(Number(circuitId), { name, distance })
     if (updatedCircuit == 404) return res.error('Circuit not found', 404)
     if (updatedCircuit) return res.success(updatedCircuit, 'Circuit was updated successfully', 200)
     return res.error(msgInternalError, 500)
