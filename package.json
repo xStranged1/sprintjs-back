@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "main": "/src/index.ts",
   "scripts": {
-    "dev": "ts-node -r tsconfig-paths/register src/index.ts --watch",
-    "build": "tsc",
+    "dev": "ts-node -r module-alias/register src/index.ts --watch",
+    "build": "tsc --project tsconfig.json",
     "typeorm": "typeorm-ts-node-esm",
-    "start": "ts-node -r tsconfig-paths/register src/index.ts --watch"
+    "start": "node -r module-alias/register dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +17,9 @@
   "bugs": {
     "url": "https://github.com/xStranged1/sprintjs-back/issues"
   },
+  "_moduleAliases": {
+    "@": "./dist"
+  },
   "homepage": "https://github.com/xStranged1/sprintjs-back#readme",
   "description": "",
   "dependencies": {
@@ -25,6 +28,7 @@
     "dotenv": "^16.4.7",
     "express": "^5.0.1",
     "express-oauth2-jwt-bearer": "^1.6.1",
+    "module-alias": "^2.2.3",
     "pg": "^8.13.2",
     "reflect-metadata": "^0.2.2",
     "typeorm": "^0.3.20"
@@ -36,6 +40,7 @@
     "@types/node": "^22.13.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
+    "tsup": "^8.4.0",
     "typescript": "^5.7.3"
   }
 }

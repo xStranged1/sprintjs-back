@@ -1,10 +1,11 @@
-import express, { Request, Response } from "express";
 import "reflect-metadata"
+import "tsconfig-paths/register";
+import 'module-alias/register';
+import express, { Request, Response } from "express";
+import cors from 'cors';
 import { sprintRoutes } from './controllers/sprintController'
 import { circuitRoutes } from "./controllers/circuitController";
 import { AppDataSource } from "./config/data-source";
-import cors from 'cors';
-import "tsconfig-paths/register";
 import responseMiddleware from "./middlewares/responseMiddleware";
 import { personalRecordRoutes } from "./controllers/personalRecordController";
 import { distancesRoutes } from "./controllers/distanceController";
