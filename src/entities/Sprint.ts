@@ -1,6 +1,7 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToOne } from "typeorm"
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn, ManyToOne, OneToMany } from "typeorm"
 import { Circuit } from "./Circuit"
 import { User } from "./User"
+import { Interval } from "./Interval"
 
 @Entity()
 export class Sprint {
@@ -41,9 +42,13 @@ export class Sprint {
     @UpdateDateColumn()
     updateDate: Date
 
+    @OneToMany(() => Interval, (interval) => interval.sprint)
+    intervals: Interval[]
+
     @ManyToOne(() => User, (user) => user.sprints)
     user: User
 
     @ManyToOne(() => Circuit, (circuit) => circuit.sprints, { nullable: true })
     circuit: Circuit | null
+
 }

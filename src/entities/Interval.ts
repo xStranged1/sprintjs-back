@@ -1,0 +1,33 @@
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Sprint } from "./Sprint";
+
+@Entity()
+export class Interval {
+
+    @PrimaryGeneratedColumn()
+    id: number
+
+    @Column({ type: 'float' })
+    distance: number
+
+    @Column()
+    time: number // time in seconds
+
+    @Column({ default: false })
+    startWithRest: boolean
+
+    @Column()
+    timeRest: number // time in seconds
+
+    @Column()
+    pace: number // seconds per km
+
+    @Column()
+    numberOfRep: number
+
+    @Column()
+    order: number
+
+    @ManyToOne(() => Sprint, (sprint) => sprint.intervals)
+    sprint: Sprint
+}
