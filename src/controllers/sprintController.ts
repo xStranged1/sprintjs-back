@@ -6,6 +6,7 @@ import { validate } from "class-validator"
 import { Sprint } from '@/entities/Sprint';
 import { Circuit } from '@/entities/Circuit';
 import { checkJwt, checkScopes, checkSub } from '@/middlewares/authMiddleware';
+import { checkOptionalIntervals } from '@/middlewares/checkIntervals';
 
 const getAllSprintController = async (req: Request, res: Response) => {
     const sprints = await getAllSprints()
@@ -29,6 +30,7 @@ const getSprintController = async (req: Request, res: Response) => {
 
 const createSprintController = (async (req: Request, res: Response) => {
     const sub = req.sub
+    const intervals = req.intervals
     const { distance, time, date, takeBreak, circuit, comment, effort, temperature, numberOfLaps } = req.body;
     if (!distance) return res.error('The distance is required', 400)
     if (!time) return res.error('The time is required', 400)
@@ -38,7 +40,7 @@ const createSprintController = (async (req: Request, res: Response) => {
     }
     if (typeof takeBreak !== 'boolean') return res.error('Boolean takeBreak is required', 400)
     const pace = Math.round((time / distance) * 1000)
-    const sprint = Object.assign(new Sprint(), { distance, time, date, pace, takeBreak, circuit, comment, effort, temperature, numberOfLaps })
+    const sprint = Object.assign(new Sprint(), { distance, time, date, pace, takeBreak, circuit, comment, effort, temperature, numberOfLaps, intervals })
     const errors = await validate(sprint)
     if (errors.length > 0) return res.error('Invalid sprint', 400, errors)
     const data = await createSprint(sprint, sub)
@@ -71,7 +73,7 @@ const updateSprintController = async (req: Request, res: Response) => {
 }
 
 export const sprintRoutes = (app: Application): void => {
-    app.post("/sprint", checkJwt, checkScopes, checkSub, createSprintController);
+    app.post("/sprint", checkJwt, checkScopes, checkSub, checkOptionalIntervals, createSprintController);
     app.get("/sprint", checkJwt, checkScopes, checkSub, getSprintsController);
     app.get("/sprintAll", checkJwt, checkScopes, checkSub, getAllSprintController);
     app.get("/sprint/:sprintId", checkJwt, checkScopes, checkSub, getSprintController);

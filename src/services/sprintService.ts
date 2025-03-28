@@ -25,7 +25,15 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.effort = sprint.effort
         newSprint.temperature = sprint.temperature
         newSprint.numberOfLaps = sprint.numberOfLaps
-        await sprintRepository.save(newSprint)
+        console.log("sprint.intervals");
+        console.log(sprint.intervals);
+        for (const s of sprint.intervals) {
+            console.log(s);
+        }
+        newSprint.intervals = sprint.intervals // already are a valid intervals
+        const sprintSaved = await sprintRepository.save(newSprint)
+        console.log("sprintSaved");
+        console.log(sprintSaved);
         const newPersonalRecord = await handleNewRecord(newSprint)
         return { newSprint, newPersonalRecord }
     } catch (error) {
@@ -77,7 +85,10 @@ export const updateSprint = async (sprintId: number, sprint: Partial<Sprint>) =>
 
 export const getSprint = async (sprintId: number) => {
     try {
-        const existingSprint = await sprintRepository.findOneBy({ id: sprintId });
+        const existingSprint = await sprintRepository.findOne({
+            where: { id: sprintId },
+            relations: { intervals: true }
+        });
         if (!existingSprint) return 404
         return existingSprint
     } catch (error) {
@@ -86,14 +97,26 @@ export const getSprint = async (sprintId: number) => {
     }
 }
 
-
 export const getAllSprints = async () => {
     try {
-        const sprints = await sprintRepository.find({ relations: { 'circuit': true }, order: { date: 'DESC' } })
+        const sprints = await sprintRepository.find({
+            relations: { 'circuit': true, 'intervals': true },
+            order: { date: 'DESC' }
+        })
         return sprints
     } catch (error) {
         console.log(error);
         return []
+    }
+}
+
+export const existSprint = async (sprintId: number) => {
+    try {
+        const existingSprint = await sprintRepository.exists({ where: { id: sprintId } });
+        return existingSprint
+    } catch (error) {
+        console.log(error);
+        return false
     }
 }
 
@@ -105,7 +128,7 @@ export const getAllSprintsByUserSub = async (userSub: string) => {
         }
 
         const sprints = await sprintRepository.find({
-            relations: { 'circuit': true },
+            relations: { 'circuit': true, 'intervals': true },
             order: { date: 'DESC' },
             where: { user: user }
         })

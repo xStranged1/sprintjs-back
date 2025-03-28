@@ -42,7 +42,7 @@ export class Sprint {
     @UpdateDateColumn()
     updateDate: Date
 
-    @OneToMany(() => Interval, (interval) => interval.sprint)
+    @OneToMany(() => Interval, (interval) => interval.sprint, { cascade: true })
     intervals: Interval[]
 
     @ManyToOne(() => User, (user) => user.sprints)

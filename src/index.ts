@@ -11,6 +11,7 @@ import { personalRecordRoutes } from "./controllers/personalRecordController";
 import { distancesRoutes } from "./controllers/distanceController";
 import { checkJwt, checkScopes } from "./middlewares/authMiddleware";
 import { userRoutes } from "./controllers/userController";
+import { intervalRoutes } from "./controllers/intervalController";
 
 AppDataSource.initialize().then(async () => {
     const app = express()
@@ -22,6 +23,8 @@ AppDataSource.initialize().then(async () => {
     circuitRoutes(app)
     personalRecordRoutes(app)
     distancesRoutes(app)
+    intervalRoutes(app)
+
     console.log('Running at http://localhost:3000/');
     app.get('/err', (req: Request, res: Response) => {
         res.error("No se pudo obtener el usuario", 400, { reason: "ID inválido" });

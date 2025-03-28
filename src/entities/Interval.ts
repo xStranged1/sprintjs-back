@@ -22,12 +22,15 @@ export class Interval {
     @Column()
     pace: number // seconds per km
 
+    @Column({ nullable: true })
+    effort: number
+
     @Column()
     numberOfRep: number
 
     @Column()
     order: number
 
-    @ManyToOne(() => Sprint, (sprint) => sprint.intervals)
+    @ManyToOne(() => Sprint, (sprint) => sprint.intervals, { onDelete: "CASCADE" })
     sprint: Sprint
 }

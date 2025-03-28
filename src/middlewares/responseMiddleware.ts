@@ -1,3 +1,4 @@
+import { Interval } from "@/entities/Interval";
 import { NextFunction, Response, Request } from "express";
 
 export interface SuccessResponse<T> {
@@ -20,6 +21,7 @@ declare global {
         }
         interface Request {
             sub: string;
+            intervals?: Interval[]
         }
     }
 }
