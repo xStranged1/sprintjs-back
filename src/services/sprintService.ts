@@ -25,15 +25,8 @@ export const createSprint = async (sprint: Omit<Sprint, 'id' | 'createDate' | 'u
         newSprint.effort = sprint.effort
         newSprint.temperature = sprint.temperature
         newSprint.numberOfLaps = sprint.numberOfLaps
-        console.log("sprint.intervals");
-        console.log(sprint.intervals);
-        for (const s of sprint.intervals) {
-            console.log(s);
-        }
         newSprint.intervals = sprint.intervals // already are a valid intervals
-        const sprintSaved = await sprintRepository.save(newSprint)
-        console.log("sprintSaved");
-        console.log(sprintSaved);
+        await sprintRepository.save(newSprint)
         const newPersonalRecord = await handleNewRecord(newSprint)
         return { newSprint, newPersonalRecord }
     } catch (error) {

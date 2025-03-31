@@ -8,7 +8,7 @@ export const checkIntervals = async (req: Request, res: Response, next: NextFunc
 
     let orders: number[] = []
     for (const interval of intervals) {
-        if (!interval.order) return res.error('The interval.order is required', 400)
+        if (!interval.order && interval.order != 0) return res.error('The interval.order is required', 400)
         const order = Number(interval.order)
         if (isNaN(order)) return res.error('The order must be a number.', 400)
         if (orders.includes(order)) return res.error(`The interval.order can't be repeated`, 400)
@@ -44,7 +44,7 @@ export const checkOptionalIntervals = async (req: Request, res: Response, next: 
 
     let orders: number[] = []
     for (const interval of intervals) {
-        if (!interval.order) return res.error('The interval.order is required', 400)
+        if (!interval.order && interval.order != 0) return res.error('The interval.order is required', 400)
         const order = Number(interval.order)
         if (isNaN(order)) return res.error('The order must be a number.', 400)
         if (orders.includes(order)) return res.error(`The interval.order can't be repeated`, 400)
@@ -62,6 +62,9 @@ export const checkOptionalIntervals = async (req: Request, res: Response, next: 
         if (isNaN(interval.timeRest)) return res.error('The time rest must be a number.', 400)
         if (!interval.numberOfRep) return res.error('The interval.numberOfRep is required', 400)
         if (isNaN(interval.numberOfRep)) return res.error('The numberOfRep must be a number.', 400)
+        if (interval.numberOfLaps) {
+            if (isNaN(Number(interval.numberOfLaps))) return res.error('The interval.numberOfLaps must be a number.', 400)
+        }
         const errors = await validate(interval as Interval)
         if (errors.length > 0) return res.error('Invalid interval', 400, errors)
         // interval.sprint = { id: sprintId }

@@ -25,6 +25,9 @@ export class Interval {
     @Column({ nullable: true })
     effort: number
 
+    @Column({ nullable: true })
+    numberOfLaps: number
+
     @Column()
     numberOfRep: number
 
