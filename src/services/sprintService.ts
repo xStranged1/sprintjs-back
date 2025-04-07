@@ -80,7 +80,7 @@ export const getSprint = async (sprintId: number) => {
     try {
         const existingSprint = await sprintRepository.findOne({
             where: { id: sprintId },
-            relations: { intervals: true }
+            relations: { intervals: true, circuit: true }
         });
         if (!existingSprint) return 404
         return existingSprint
