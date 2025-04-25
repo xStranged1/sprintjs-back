@@ -16,7 +16,7 @@ export class Interval {
     @Column({ default: false })
     startWithRest: boolean
 
-    @Column()
+    @Column({ nullable: true, default: 0 })
     timeRest: number // time in seconds
 
     @Column()

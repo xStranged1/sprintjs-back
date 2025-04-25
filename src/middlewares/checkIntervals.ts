@@ -58,8 +58,9 @@ export const checkOptionalIntervals = async (req: Request, res: Response, next: 
         if (isNaN(interval.distance)) return res.error('The distance must be a number.', 400)
         if (!interval.time) return res.error('The interval.time is required', 400)
         if (isNaN(interval.time)) return res.error('The time must be a number.', 400)
-        if (!interval.timeRest) return res.error('The interval.timeRest is required', 400)
-        if (isNaN(interval.timeRest)) return res.error('The time rest must be a number.', 400)
+        if (interval.timeRest) {
+            if (isNaN(interval.timeRest)) return res.error('The time rest must be a number.', 400)
+        }
         if (!interval.numberOfRep) return res.error('The interval.numberOfRep is required', 400)
         if (isNaN(interval.numberOfRep)) return res.error('The numberOfRep must be a number.', 400)
         if (interval.numberOfLaps) {
