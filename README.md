@@ -39,3 +39,17 @@ docker run --rm -e PGPASSWORD="PGPASSWORD" -v ${PWD}:/backups postgres:16 `
   --verbose `
   /backups/sprint_backup.dump
 ```
+
+
+### Restore local backup.dump cmd (set password db)
+```cmd
+"C:\Program Files\PostgreSQL\16\bin\pg_restore.exe" ^ 
+  --host=localhost ^
+  --port=5432 ^
+  --username=postgres ^
+  --dbname=sprintjs ^ 
+  --password=^
+  --verbose ^
+  --clean ^
+  "C:\Users\Fede\Desktop\backup\1-6\sprint_backup.dump"
+```
